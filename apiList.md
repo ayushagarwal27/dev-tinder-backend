@@ -10,7 +10,7 @@ profileRouter
 - PATCH /profile/edit
 - PATCH /profile/password
 
-connectionRequestRouter
+requestRouter
 - POST /request/send/interested/:userId
 - POST /request/send/ignored/:userId
 - POST /request/review/accepted/:requestId
