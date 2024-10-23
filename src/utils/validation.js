@@ -14,4 +14,25 @@ function validateSignupData(req) {
   }
 }
 
-module.exports = { validateSignupData };
+function validateEditData(req, res, next) {
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "email",
+    "avatar_url",
+    "about",
+    "skills",
+  ];
+
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field),
+  );
+
+  if (!isEditAllowed) {
+    res.status(401).send("Invalid Edit Request");
+    return;
+  }
+  next();
+}
+
+module.exports = { validateSignupData, validateEditData };
