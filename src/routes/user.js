@@ -32,14 +32,21 @@ router.get("/connections", userAuth, async (req, res) => {
   const loggedInUser = req.user;
 
   try {
-    const connectionRequest = await ConnectionRequest.find({
+    const connectionRequests = await ConnectionRequest.find({
       $or: [
         { fromUserId: loggedInUser.userId, status: "accepted" },
         { toUserId: loggedInUser.userId, status: "accepted" },
       ],
-    }).populate("fromUserId", ["firstName", "lastName", "avatar_url"]);
+    })
+      .populate("fromUserId", ["firstName", "lastName", "avatar_url"])
+      .populate("toUserId", ["firstName", "lastName", "avatar_url"]);
 
-    res.status(200).json({ data: connectionRequest });
+    const data = connectionRequests.map((row) => {
+      return row.fromUserId._id.toString() === loggedInUser.userId.toString()
+        ? row.toUserId
+        : row.fromUserId;
+    });
+    res.status(200).json({ data });
   } catch (err) {
     res.status(400).json({ message: "Something went wrong" });
   }
