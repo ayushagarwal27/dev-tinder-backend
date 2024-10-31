@@ -57,6 +57,10 @@ router.get("/connections", userAuth, async (req, res) => {
 
 router.get("/feed", userAuth, async (req, res) => {
   const loggedInUser = req.user;
+  let { page, limit } = req.query;
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 10;
+  limit = limit > 50 ? 50 : limit;
 
   try {
     const connectionRequests = await ConnectionRequest.find({
@@ -76,7 +80,10 @@ router.get("/feed", userAuth, async (req, res) => {
 
     const users = await User.find({
       _id: { $nin: Array.from(usersWithRequestConnectionCreated) },
-    }).select(USER_DATA_TO_SEND);
+    })
+      .select(USER_DATA_TO_SEND)
+      .skip((page - 1) * limit)
+      .limit(limit);
 
     res.status(200).json({ data: users });
   } catch (err) {
